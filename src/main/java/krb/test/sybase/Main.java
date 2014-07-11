@@ -48,6 +48,9 @@ public class Main {
             while (rs.next())
                 System.out.println("User is: " + rs.getString(1));
             rs.close();
+            rs = stmt.executeQuery("select db_name()");
+            while (rs.next())
+                System.out.println("Database is: " + rs.getString(1));
             // get auth type -- need permission
 //            rs = stmt.executeQuery("select auth_scheme from sys.dm_exec_connections where session_id=@@spid;");
 //            while (rs.next())
