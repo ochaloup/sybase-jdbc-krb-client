@@ -78,9 +78,12 @@ public class Main {
             }
         });
 
-        printUserName(conn);
-
-        conn.close();
+        try {
+          create(conn);
+          print(conn);
+        } finally {
+          if(conn!=null) conn.close();
+        }
     }
 
     private static void printUserName(Connection conn) throws SQLException {
@@ -99,6 +102,58 @@ public class Main {
 //            while (rs.next())
 //                System.out.println("Auth type: " + rs.getString(1));
 //            rs.close();
+        } finally {
+            if (stmt != null)
+                stmt.close();
+        }
+    }
+
+    private static void create(Connection conn) throws SQLException {
+        Statement stmt = null;
+        try {
+            stmt = conn.createStatement();
+            stmt.execute("CREATE TABLE testentity ( id VARCHAR(255), a INTEGER )");
+        } finally {
+            if (stmt != null)
+                stmt.close();
+        }
+    }
+
+    private static void drop(Connection conn) throws SQLException {
+        Statement stmt = null;
+        try {
+            stmt = conn.createStatement();
+            stmt.execute("DROP TABLE testentity");
+        } finally {
+            if (stmt != null)
+                stmt.close();
+        }
+    }
+
+    private static void print(Connection conn) throws SQLException {
+        Statement stmt = null;
+        try {
+            stmt = conn.createStatement();
+            String query = "select * from testentity";
+            // String query = "select table_name from user_tables";
+            // String query = "select owner, table_name from all_tables";
+            System.out.println("Query: " + query);
+            ResultSet rs = stmt.executeQuery(query);
+            int columnCount = rs.getMetaData().getColumnCount();
+            System.out.println("Result set is: " + rs);
+            int row = 1;
+            while (rs.next()) {
+                StringBuffer output = new StringBuffer();
+                for(int i=1; i<=columnCount; i++) { 
+                  // String user = rs.getString(1);
+                  // System.out.println("User is: " + user);
+                  // logger.log(Level.INFO, "User is: " + user);
+                  output.append("|" + rs.getObject(i).toString()); 
+                }
+                System.out.println(row + output.toString());
+                row++;
+            }
+            rs.close();
         } finally {
             if (stmt != null)
                 stmt.close();
